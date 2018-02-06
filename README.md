@@ -14,6 +14,12 @@ Validator::make([
     'name' => 'required|string|min:5|message:用户名长度必须大于5个字符'
 ])->validate($data);  // bool
 
+Validator::make([
+    'name' => 'required',
+], $data); // 简写 bool
+
+Validator::required()->valdate($value); // bool
+
 $v = Validator::make([]);
 $v->validate(); // bool
 $v->errors();    // ['name' => ['错误信息']]
@@ -56,5 +62,15 @@ class Do extends Model {
 Request::validate([
     'name' => 'required'
 ]); // ['name' => '值']
+
+```
+
+## 验证方法
+
+required 必填
+
+```PHP
+
+Validator::required()->validate('1'); // true
 
 ```

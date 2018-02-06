@@ -8,17 +8,47 @@ namespace Zodream\Validate;
  * Time: 12:16
  */
 use Zodream\Infrastructure\Support\MessageBag;
+use Exception;
+use Zodream\Validate\Rules\UrlRule;
+use Zodream\Validate\Rules\RequiredRule;
+use Zodream\Validate\Rules\RegexRule;
+use Zodream\Validate\Rules\InRule;
+use Zodream\Validate\Rules\MaxRule;
+use Zodream\Validate\Rules\MinRule;
+use Zodream\Validate\Rules\NumericRule;
+use Zodream\Validate\Rules\EmailRule;
+use Zodream\Validate\Rules\PhoneRule;
 
+/**
+ * Class Validator
+ * @package Zodream\Validate
+ * @method static UrlRule url()
+ * @method static RequiredRule required()
+ * @method static RegexRule regex(string $regex)
+ * @method static Validator age(int $minAge = null, int $maxAge = null)
+ * @method static InRule in(mixed $haystack, bool $compareIdentical = false)
+ * @method static MaxRule max(mixed $maxValue, bool $inclusive = true)
+ * @method static MinRule min(mixed $minValue, bool $inclusive = true)
+ * @method static NumericRule numeric()
+ * @method static Validator bool()
+ * @method static EmailRule email()
+ * @method static Validator equals(mixed $compareTo)
+ * @method static Validator length(int $min = null, int $max = null, bool $inclusive = true)
+ * @method static Validator size(string $minSize = null, string $maxSize = null)
+ * @method static Validator unique()
+ * @method static PhoneRule phone()
+ */
 class Validator {
-    protected $data = [];
+
+    protected $attributes = [];
     protected $rules = [];
     /**
      * @var MessageBag
      */
     protected $message;
 
-    public function setData($arg) {
-        $this->data = (array)$arg;
+    public function setAttributes($arg) {
+        $this->attributes = (array)$arg;
         return $this;
     }
 
@@ -26,6 +56,7 @@ class Validator {
         foreach ((array)$args as $key => $arg) {
             $this->rules[] = $this->converterRule($arg, $key);
         }
+        return $this;
     }
 
     protected function converterRule($rule, $key = null) {
@@ -62,14 +93,14 @@ class Validator {
     /**
      * Run the validator's rules against its data.
      *
-     * @return void
-     *
-     * @throws ValidationException
+     * @param array $data
+     * @return boolean
      */
-    public function validate() {
-        if ($this->fails()) {
-            throw new ValidationException($this);
+    public function validate(array $data = []) {
+        if (!empty($data)) {
+            $this->setAttributes($data);
         }
+        return !$this->fails();
     }
 
     /**
@@ -82,6 +113,38 @@ class Validator {
             $this->passes();
         }
         return $this->message;
+    }
+
+    public function errors() {
+        return $this->messages()->all();
+    }
+
+    public function firstError() {
+        return $this->messages()->first();
+    }
+
+
+    public static function make(array $rules, array $data = null) {
+        $validator = new static();
+        $validator->setRules($rules);
+        if (is_null($data)) {
+            return $validator;
+        }
+        return $validator->validate($data);
+    }
+
+    /**
+     * @param $ruleName
+     * @param array $arguments
+     * @return RuleInterface
+     * @throws Exception
+     */
+    public static function buildRule($ruleName, $arguments = []) {
+        return RuleFactory::getInstance()->rule($ruleName, $arguments);
+    }
+
+    public static function __callStatic($ruleName, $arguments) {
+        return static::buildRule($ruleName, $arguments);
     }
 
 }
