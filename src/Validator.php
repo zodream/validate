@@ -9,6 +9,7 @@ namespace Zodream\Validate;
  */
 use Zodream\Infrastructure\Support\MessageBag;
 use Exception;
+use Zodream\Service\Factory;
 use Zodream\Validate\Rules\UrlRule;
 use Zodream\Validate\Rules\RequiredRule;
 use Zodream\Validate\Rules\RegexRule;
@@ -42,10 +43,24 @@ class Validator {
 
     protected $attributes = [];
     protected $rules = [];
+    protected $labels = [];
+    protected $messages = [];
+
     /**
      * @var MessageBag
      */
     protected $message;
+
+    public function __construct() {
+        $messages = Factory::i18n('validate');
+        if (!is_array($messages)) {
+            return;
+        }
+        $this->setMessages($messages);
+        if (isset($messages['attributes'])) {
+            $this->setLabels($messages['attributes']);
+        }
+    }
 
     public function setAttributes($arg) {
         $this->attributes = (array)$arg;
@@ -59,26 +74,87 @@ class Validator {
         return $this;
     }
 
-    protected function converterRule($rule, $key = null) {
+    public function setLabels(array $labels) {
+        $this->labels = $labels;
+        return $this;
+    }
 
+    public function setMessages(array $messages) {
+        $this->messages = $messages;
+        return $this;
+    }
+
+    /**
+     * 格式化规则
+     * @param $rule
+     * @param null $keys
+     * @return array
+     */
+    protected function converterRule($rule, $keys = null) {
+        if (is_integer($keys) && is_array($rule)) {
+            $keys = array_shift($rule);
+        }
+        if (!is_array($rule)) {
+            $rule = explode('|', $rule);
+        }
+        $rules = [];
+        $message = null;
+        foreach ($rule as $key => $item) {
+            if (!is_integer($key)) {
+                $rules[$key] = $item;
+                continue;
+            }
+            if (!is_string($item) || strpos(':', $item)) {
+                $rules[$item] = [];
+                continue;
+            }
+            list($key, $val) = explode(':', $item, 2);
+            if ($key == 'message') {
+                $message = $val;
+                continue;
+            }
+            $rules[$key] = explode(',', $val);
+        }
+        return compact('keys', 'rules', 'message');
     }
 
     /**
      * Determine if the data passes the validation rules.
      *
      * @return bool
+     * @throws Exception
      */
     public function passes() {
         $this->message = new MessageBag;
-
-        // We'll spin through each rule, validating the attributes attached to that
-        // rule. Any error messages will be added to the containers with each of
-        // the other error messages, returning true if we don't have messages.
-        foreach ($this->rules as $attribute => $rules) {
-
+        foreach ($this->rules as $item) {
+            foreach ((array)$item['keys'] as $key) {
+                foreach ($item['rules'] as $rule => $args) {
+                    if (static::buildRule($rule, (array)$args)) {
+                        continue;
+                    }
+                    $this->message->add($key, $this->getMessage($key, $rule, $item['message']));
+                }
+            }
         }
-
         return $this->message->isEmpty();
+    }
+
+    /**
+     * 获取验证错误的消息
+     * @param $key
+     * @param $rule
+     * @param null $message
+     * @return mixed
+     */
+    protected function getMessage($key, $rule, $message = null) {
+        $label = isset($this->labels[$key]) ? $this->labels[$key] : $key;
+        if (!is_null($message)) {
+            return str_replace(':attribute', $label, $message);
+        }
+        if (isset($this->messages[$key.'.'.$rule])) {
+            return $this->messages[$key.'.'.$rule];
+        }
+        return str_replace(':attribute', $label, $this->messages[$rule]);
     }
 
     /**
@@ -124,9 +200,9 @@ class Validator {
     }
 
 
-    public static function make(array $rules, array $data = null) {
+    public static function make(array $rules, array $data = null, array $messages = [], array $labels = []) {
         $validator = new static();
-        $validator->setRules($rules);
+        $validator->setRules($rules)->setLabels($labels)->setMessages($messages);
         if (is_null($data)) {
             return $validator;
         }
