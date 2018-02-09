@@ -44,7 +44,9 @@ class Validator {
     protected $attributes = [];
     protected $rules = [];
     protected $labels = [];
-    protected $messages = [];
+    protected $messages = [
+        ''
+    ];
 
     /**
      * @var MessageBag
@@ -75,12 +77,16 @@ class Validator {
     }
 
     public function setLabels(array $labels) {
-        $this->labels = $labels;
+        if (!empty($labels)) {
+            $this->labels = $labels;
+        }
         return $this;
     }
 
     public function setMessages(array $messages) {
-        $this->messages = $messages;
+        if (empty($messages)) {
+            $this->messages = $messages;
+        }
         return $this;
     }
 
@@ -104,7 +110,7 @@ class Validator {
                 $rules[$key] = $item;
                 continue;
             }
-            if (!is_string($item) || strpos(':', $item)) {
+            if (!is_string($item) || strpos(':', $item) === false) {
                 $rules[$item] = [];
                 continue;
             }
@@ -129,7 +135,8 @@ class Validator {
         foreach ($this->rules as $item) {
             foreach ((array)$item['keys'] as $key) {
                 foreach ($item['rules'] as $rule => $args) {
-                    if (static::buildRule($rule, (array)$args)) {
+                    if (static::buildRule($rule, (array)$args)
+                        ->validate(isset($this->attributes[$key]) ? $this->attributes[$key] : null)) {
                         continue;
                     }
                     $this->message->add($key, $this->getMessage($key, $rule, $item['message']));

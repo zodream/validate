@@ -36,7 +36,6 @@ class RuleFactory {
             }
             return $this->createReflectionClass($className, RuleInterface::class)->newInstanceArgs($arguments);
         }
-
         throw new Exception(sprintf('"%s" is not a valid rule name', $ruleName));
     }
 
