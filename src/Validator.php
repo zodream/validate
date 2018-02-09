@@ -71,7 +71,7 @@ class Validator {
 
     public function setRules($args) {
         foreach ((array)$args as $key => $arg) {
-            $this->rules[] = $this->converterRule($arg, $key);
+            $this->rules[] = $this->converterRules($arg, $key);
         }
         return $this;
     }
@@ -96,10 +96,21 @@ class Validator {
      * @param null $keys
      * @return array
      */
-    protected function converterRule($rule, $keys = null) {
+    protected function converterRules($rule, $keys = null) {
         if (is_integer($keys) && is_array($rule)) {
             $keys = array_shift($rule);
         }
+        $rules = $this->converterRule($rule);
+        $rules['keys'] = $keys;
+        return $rules;
+    }
+
+    /**
+     * 转化一条规则
+     * @param $rule
+     * @return array
+     */
+    public function converterRule($rule) {
         if (!is_array($rule)) {
             $rule = explode('|', $rule);
         }
@@ -109,6 +120,9 @@ class Validator {
             if (!is_integer($key)) {
                 $rules[$key] = $item;
                 continue;
+            }
+            if (is_callable($item)) {
+                $rules[] = $item;
             }
             if (!is_string($item) || strpos(':', $item) === false) {
                 $rules[$item] = [];
@@ -121,7 +135,7 @@ class Validator {
             }
             $rules[$key] = explode(',', $val);
         }
-        return compact('keys', 'rules', 'message');
+        return compact('rules', 'message');
     }
 
     /**
@@ -134,16 +148,30 @@ class Validator {
         $this->message = new MessageBag;
         foreach ($this->rules as $item) {
             foreach ((array)$item['keys'] as $key) {
-                foreach ($item['rules'] as $rule => $args) {
-                    if (static::buildRule($rule, (array)$args)
-                        ->validate(isset($this->attributes[$key]) ? $this->attributes[$key] : null)) {
-                        continue;
-                    }
-                    $this->message->add($key, $this->getMessage($key, $rule, $item['message']));
-                }
+                $this->validateRule($key, isset($this->attributes[$key]) ? $this->attributes[$key] : null, $item['rules'], $item['message']);
             }
         }
         return $this->message->isEmpty();
+    }
+
+    /**
+     * @param $key
+     * @param $value
+     * @param $rules
+     * @param null $message
+     * @throws Exception
+     */
+    public function validateRule($key, $value, array $rules, $message = null) {
+        foreach ($rules as $rule => $args) {
+            if (is_callable($args)) {
+                continue;
+            }
+            if (static::buildRule($rule, (array)$args)
+                ->validate($value)) {
+                continue;
+            }
+            $this->message->add($key, $this->getMessage($key, $rule, $message));
+        }
     }
 
     /**
@@ -153,7 +181,7 @@ class Validator {
      * @param null $message
      * @return mixed
      */
-    protected function getMessage($key, $rule, $message = null) {
+    public function getMessage($key, $rule, $message = null) {
         $label = isset($this->labels[$key]) ? $this->labels[$key] : $key;
         if (!is_null($message)) {
             return str_replace(':attribute', $label, $message);
@@ -168,6 +196,7 @@ class Validator {
      * Determine if the data fails the validation rules.
      *
      * @return bool
+     * @throws Exception
      */
     public function fails() {
         return ! $this->passes();
@@ -178,6 +207,7 @@ class Validator {
      *
      * @param array $data
      * @return boolean
+     * @throws Exception
      */
     public function validate(array $data = []) {
         if (!empty($data)) {
@@ -190,6 +220,7 @@ class Validator {
      * Get the message container for the validator.
      *
      * @return MessageBag
+     * @throws Exception
      */
     public function messages() {
         if (! $this->message) {
@@ -229,5 +260,4 @@ class Validator {
     public static function __callStatic($ruleName, $arguments) {
         return static::buildRule($ruleName, $arguments);
     }
-
 }
