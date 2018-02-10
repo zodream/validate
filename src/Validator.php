@@ -45,7 +45,15 @@ class Validator {
     protected $rules = [];
     protected $labels = [];
     protected $messages = [
-        ''
+        'required' => ':attribute is required.',
+        'int' => ':attribute is invalid integer.',
+        'numeric' => ':attribute is invalid numeric.',
+        'phone' => ':attribute is invalid phone.',
+        'string' => ':attribute is invalid string.',
+        'length' => ':attribute is invalid string.',
+        'email' => ':attribute is invalid email.',
+        'url' => ':attribute is invalid url.',
+        'bool' => ':attribute is invalid bool.',
     ];
 
     /**
@@ -84,7 +92,7 @@ class Validator {
     }
 
     public function setMessages(array $messages) {
-        if (empty($messages)) {
+        if (!empty($messages)) {
             $this->messages = $messages;
         }
         return $this;
@@ -124,7 +132,7 @@ class Validator {
             if (is_callable($item)) {
                 $rules[] = $item;
             }
-            if (!is_string($item) || strpos(':', $item) === false) {
+            if (!is_string($item) || strpos($item, ':') === false) {
                 $rules[$item] = [];
                 continue;
             }
