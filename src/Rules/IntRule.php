@@ -22,7 +22,6 @@ class IntRule extends AbstractRule {
         if (is_integer($input)) {
             return $this->validateMax($input) && $this->validateMin($input);
         }
-
         return $input == intval($input) && $this->validateMax($input) && $this->validateMin($input);
     }
 

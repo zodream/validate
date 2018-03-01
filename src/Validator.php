@@ -19,6 +19,7 @@ use Zodream\Validate\Rules\MinRule;
 use Zodream\Validate\Rules\NumericRule;
 use Zodream\Validate\Rules\EmailRule;
 use Zodream\Validate\Rules\PhoneRule;
+use Zodream\Validate\Rules\IntRule;
 
 /**
  * Class Validator
@@ -33,6 +34,7 @@ use Zodream\Validate\Rules\PhoneRule;
  * @method static NumericRule numeric()
  * @method static Validator bool()
  * @method static EmailRule email()
+ * @method static IntRule int()
  * @method static Validator equals(mixed $compareTo)
  * @method static Validator length(int $min = null, int $max = null, bool $inclusive = true)
  * @method static Validator size(string $minSize = null, string $maxSize = null)
