@@ -5,6 +5,7 @@ use Zodream\Helpers\Str;
 use Zodream\Infrastructure\Traits\SingletonPattern;
 use ReflectionClass;
 use Exception;
+use Zodream\Validate\Rules\NullableRule;
 
 class RuleFactory {
     use SingletonPattern;
@@ -29,6 +30,9 @@ class RuleFactory {
      * @throws Exception
      */
     public function rule($ruleName, array $arguments = []) {
+        if (empty($ruleName)) {
+            return new NullableRule();
+        }
         foreach ($this->rulesNamespaces as $namespace) {
             $className = sprintf('%s\\%sRule', $namespace, Str::studly($ruleName));
             if (!class_exists($className)) {
