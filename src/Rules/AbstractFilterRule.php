@@ -11,7 +11,9 @@ abstract class AbstractFilterRule extends AbstractRule {
 
     public function __construct($additionalChars = '') {
         if (!is_string($additionalChars)) {
-            throw new Exception('Invalid list of additional characters to be loaded');
+            throw new Exception(
+                __('Invalid list of additional characters to be loaded')
+            );
         }
 
         $this->additionalChars .= $additionalChars;

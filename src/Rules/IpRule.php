@@ -1,6 +1,7 @@
 <?php
 namespace Zodream\Validate\Rules;
 
+use Exception;
 
 class IpRule extends AbstractRule {
 
@@ -33,15 +34,21 @@ class IpRule extends AbstractRule {
         } elseif (false !== mb_strpos($input, '/')) {
             $this->parseRangeUsingCidr($input, $range);
         } else {
-            throw new ComponentException('Invalid network range');
+            throw new Exception(
+                __('Invalid network range')
+            );
         }
 
         if (!$this->verifyAddress($range['min'])) {
-            throw new ComponentException('Invalid network range');
+            throw new Exception(
+                __('Invalid network range')
+            );
         }
 
         if (isset($range['max']) && !$this->verifyAddress($range['max'])) {
-            throw new ComponentException('Invalid network range');
+            throw new Exception(
+                __('Invalid network range')
+            );
         }
 
         return $range;
@@ -74,7 +81,9 @@ class IpRule extends AbstractRule {
         }
 
         if ($isAddressMask || $input[1] < 8 || $input[1] > 30) {
-            throw new ComponentException('Invalid network mask');
+            throw new Exception(
+                __('Invalid network mask')
+            );
         }
 
         $range['mask'] = sprintf('%032b', ip2long(long2ip(~(2 ** (32 - $input[1]) - 1))));

@@ -40,18 +40,22 @@ class RuleFactory {
             }
             return $this->createReflectionClass($className, RuleInterface::class)->newInstanceArgs($arguments);
         }
-        throw new Exception(sprintf('"%s" is not a valid rule name', $ruleName));
+        throw new Exception(sprintf(
+            __('"%s" is not a valid rule name'), $ruleName));
     }
 
 
     private function createReflectionClass($name, $parentName) {
         $reflection = new ReflectionClass($name);
         if (!$reflection->isSubclassOf($parentName)) {
-            throw new Exception(sprintf('"%s" must be an instance of "%s"', $name, $parentName));
+            throw new Exception(sprintf(
+                __('"%s" must be an instance of "%s"'),
+                $name, $parentName));
         }
 
         if (!$reflection->isInstantiable()) {
-            throw new InvalidClassException(sprintf('"%s" must be instantiable', $name));
+            throw new InvalidClassException(sprintf(
+                __('"%s" must be instantiable'), $name));
         }
 
         return $reflection;

@@ -17,7 +17,9 @@ class ValidationException extends Exception {
      * @param  Validator  $validator
      */
     public function __construct($validator) {
-        parent::__construct('The given data failed to pass validation.');
+        parent::__construct(
+            __('The given data failed to pass validation.')
+        );
         $this->validator = $validator;
     }
 }

@@ -40,7 +40,9 @@ abstract class AbstractRule implements RuleInterface {
      * @return Exception
      */
     public function reportError($input, array $extraParams = []) {
-        return new Exception(sprintf('%s is error', $input));
+        return new Exception(sprintf(
+            __('%s is error'),
+            $input));
     }
 
 
