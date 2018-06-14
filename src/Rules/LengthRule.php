@@ -23,7 +23,8 @@ class LengthRule extends AbstractRule {
 
     protected function extractLength($input) {
         if (is_string($input)) {
-            return mb_strlen($input, mb_detect_encoding($input));
+            $encoding = mb_detect_encoding($input);
+            return $encoding ? mb_strlen($input, $encoding) : mb_strlen($input);
         }
 
         if (is_array($input) || $input instanceof \Countable) {
