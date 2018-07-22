@@ -169,6 +169,7 @@ class Validator {
      * @param $value
      * @param $rules
      * @param null $message
+     * @return bool
      * @throws Exception
      */
     public function validateRule($key, $value, array $rules, $message = null) {
@@ -182,6 +183,7 @@ class Validator {
             }
             $this->message->add($key, $this->getMessage($key, $rule, $message));
         }
+        return $this->message->isEmpty();
     }
 
     /**

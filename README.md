@@ -59,7 +59,7 @@ class Do extends Model {
 
 ```PHP
 
-Request::validate([
+app('request')->validate([
     'name' => 'required'
 ]); // ['name' => '值']
 
