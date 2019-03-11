@@ -10,6 +10,6 @@ class UrlRule extends AbstractRule {
      * @return boolean
      */
     public function validate($input) {
-        return true;
+        return filter_var($input, FILTER_VALIDATE_URL) !== false;
     }
 }
