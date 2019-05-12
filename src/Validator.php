@@ -122,7 +122,7 @@ class Validator {
      */
     public function converterRule($rule) {
         if (!is_array($rule)) {
-            $rule = explode('|', $rule);
+            $rule = empty($rule) ? [] : explode('|', $rule);
         }
         $rules = [];
         $message = null;
@@ -173,6 +173,9 @@ class Validator {
      * @throws Exception
      */
     public function validateRule($key, $value, array $rules, $message = null) {
+        if (!$this->message) {
+            $this->message = new MessageBag;
+        }
         foreach ($rules as $rule => $args) {
             if (is_callable($args)) {
                 continue;
