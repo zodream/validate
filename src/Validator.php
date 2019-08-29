@@ -49,6 +49,7 @@ class Validator {
     protected $messages = [
         'required' => ':attribute is required.',
         'int' => ':attribute is invalid integer.',
+        'in' => ':attribute is not in range.',
         'numeric' => ':attribute is invalid numeric.',
         'phone' => ':attribute is invalid phone.',
         'string' => ':attribute is invalid string.',

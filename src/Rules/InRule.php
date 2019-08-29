@@ -6,6 +6,12 @@ class InRule extends AbstractRule {
     public $compareIdentical;
 
     public function __construct($haystack, $compareIdentical = false) {
+        if (func_num_args() > 1
+            && !is_array($haystack)
+            && !is_bool($compareIdentical)) {
+            $this->haystack = func_get_args();
+            return;
+        }
         $this->haystack = $haystack;
         $this->compareIdentical = $compareIdentical;
     }
