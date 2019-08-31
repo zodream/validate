@@ -7,7 +7,6 @@ namespace Zodream\Validate;
  * Date: 2016/12/6
  * Time: 12:16
  */
-use Zodream\Infrastructure\Support\MessageBag;
 use Exception;
 use Zodream\Service\Factory;
 use Zodream\Validate\Rules\UrlRule;
@@ -65,6 +64,9 @@ class Validator {
     protected $message;
 
     public function __construct() {
+        if (!class_exists(Factory::class)) {
+            return;
+        }
         $messages = Factory::i18n('validate');
         if (!is_array($messages)) {
             return;
