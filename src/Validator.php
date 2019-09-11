@@ -130,6 +130,10 @@ class Validator {
         $rules = [];
         $message = null;
         foreach ($rule as $key => $item) {
+            if ($key === 'message') {
+                $message = $item;
+                continue;
+            }
             if (!is_integer($key)) {
                 $rules[$key] = $item;
                 continue;
@@ -142,7 +146,7 @@ class Validator {
                 continue;
             }
             list($key, $val) = explode(':', $item, 2);
-            if ($key == 'message') {
+            if ($key === 'message') {
                 $message = $val;
                 continue;
             }
