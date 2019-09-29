@@ -211,7 +211,10 @@ class Validator {
         if (isset($this->messages[$key.'.'.$rule])) {
             return $this->messages[$key.'.'.$rule];
         }
-        return str_replace(':attribute', $label, $this->messages[$rule]);
+        if (isset($this->messages[$rule])) {
+            return str_replace(':attribute', $label, $this->messages[$rule]);
+        }
+        return sprintf('%s %s error!', $label, $rule);
     }
 
     /**
