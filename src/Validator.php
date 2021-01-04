@@ -8,7 +8,6 @@ namespace Zodream\Validate;
  * Time: 12:16
  */
 use Exception;
-use Zodream\Service\Factory;
 use Zodream\Validate\Rules\UrlRule;
 use Zodream\Validate\Rules\RequiredRule;
 use Zodream\Validate\Rules\RegexRule;
@@ -64,10 +63,10 @@ class Validator {
     protected $message;
 
     public function __construct() {
-        if (!class_exists(Factory::class)) {
+        if (!function_exists('trans')) {
             return;
         }
-        $messages = Factory::i18n('validate');
+        $messages = trans('validate');
         if (!is_array($messages)) {
             return;
         }
