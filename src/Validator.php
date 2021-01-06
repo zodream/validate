@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 namespace Zodream\Validate;
 
 /**
@@ -41,10 +42,10 @@ use Zodream\Validate\Rules\IntRule;
  */
 class Validator {
 
-    protected $attributes = [];
-    protected $rules = [];
-    protected $labels = [];
-    protected $messages = [
+    protected array $attributes = [];
+    protected array $rules = [];
+    protected array $labels = [];
+    protected array $messages = [
         'required' => ':attribute is required.',
         'int' => ':attribute is invalid integer.',
         'in' => ':attribute is not in range.',
@@ -60,7 +61,7 @@ class Validator {
     /**
      * @var MessageBag
      */
-    protected $message;
+    protected MessageBag $message;
 
     public function __construct() {
         if (!function_exists('trans')) {
@@ -140,7 +141,7 @@ class Validator {
             if (is_callable($item)) {
                 $rules[] = $item;
             }
-            if (!is_string($item) || strpos($item, ':') === false) {
+            if (!is_string($item) || !str_contains($item, ':')) {
                 $rules[$item] = [];
                 continue;
             }
@@ -160,7 +161,7 @@ class Validator {
      * @return bool
      * @throws Exception
      */
-    public function passes() {
+    public function passes(): bool {
         $this->message = new MessageBag;
         foreach ($this->rules as $item) {
             foreach ((array)$item['keys'] as $key) {
@@ -178,7 +179,7 @@ class Validator {
      * @return bool
      * @throws Exception
      */
-    public function validateRule($key, $value, array $rules, $message = null) {
+    public function validateRule($key, $value, array $rules, $message = null): bool {
         if (!$this->message) {
             $this->message = new MessageBag;
         }
@@ -200,9 +201,9 @@ class Validator {
      * @param $key
      * @param $rule
      * @param null $message
-     * @return mixed
+     * @return string
      */
-    public function getMessage($key, $rule, $message = null) {
+    public function getMessage($key, $rule, $message = null): string {
         $label = isset($this->labels[$key]) ? $this->labels[$key] : $key;
         if (!is_null($message)) {
             return str_replace(':attribute', $label, $message);
@@ -222,7 +223,8 @@ class Validator {
      * @return bool
      * @throws Exception
      */
-    public function fails() {
+    public function fails(): bool
+    {
         return ! $this->passes();
     }
 
@@ -233,7 +235,8 @@ class Validator {
      * @return boolean
      * @throws Exception
      */
-    public function validate(array $data = []) {
+    public function validate(array $data = []): bool
+    {
         if (!empty($data)) {
             $this->setAttributes($data);
         }
@@ -246,7 +249,8 @@ class Validator {
      * @return MessageBag
      * @throws Exception
      */
-    public function messages() {
+    public function messages(): MessageBag
+    {
         if (! $this->message) {
             $this->passes();
         }

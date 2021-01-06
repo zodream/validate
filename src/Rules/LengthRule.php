@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 namespace Zodream\Validate\Rules;
 
 
@@ -12,16 +13,15 @@ class LengthRule extends AbstractRule {
         $this->minValue = $min;
         $this->maxValue = $max;
         $this->inclusive = $inclusive;
-
     }
 
-    public function validate($input) {
+    public function validate($input): bool {
         $length = $this->extractLength($input);
 
         return $this->validateMin($length) && $this->validateMax($length);
     }
 
-    protected function extractLength($input) {
+    protected function extractLength($input): int {
         if (is_string($input)) {
             $encoding = mb_detect_encoding($input);
             return $encoding ? mb_strlen($input, $encoding) : mb_strlen($input);
@@ -39,10 +39,10 @@ class LengthRule extends AbstractRule {
             return mb_strlen((string) $input);
         }
 
-        return false;
+        return 0;
     }
 
-    protected function validateMin($length) {
+    protected function validateMin(int $length): bool {
         if (is_null($this->minValue)) {
             return true;
         }
@@ -54,7 +54,7 @@ class LengthRule extends AbstractRule {
         return $length > $this->minValue;
     }
 
-    protected function validateMax($length) {
+    protected function validateMax(int $length): bool {
         if (is_null($this->maxValue)) {
             return true;
         }

@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 namespace Zodream\Validate\Rules;
 
 use Exception;
@@ -23,7 +24,7 @@ abstract class AbstractFilterRule extends AbstractRule {
         return str_replace(str_split($this->additionalChars), '', $input);
     }
 
-    public function validate($input) {
+    public function validate($input): bool {
         if (!is_scalar($input)) {
             return false;
         }

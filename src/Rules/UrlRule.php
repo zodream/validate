@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 namespace Zodream\Validate\Rules;
 
 
@@ -9,7 +10,7 @@ class UrlRule extends AbstractRule {
      * @param mixed $input
      * @return boolean
      */
-    public function validate($input) {
+    public function validate($input): bool {
         return filter_var($input, FILTER_VALIDATE_URL) !== false;
     }
 }

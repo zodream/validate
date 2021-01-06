@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 namespace Zodream\Validate\Rules;
 
 
@@ -18,7 +19,7 @@ class IntRule extends AbstractRule {
      * @param mixed $input
      * @return boolean
      */
-    public function validate($input) {
+    public function validate($input): bool {
         if (is_integer($input)) {
             return $this->validateMax($input) && $this->validateMin($input);
         }

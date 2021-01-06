@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 namespace Zodream\Validate\Rules;
 
 
@@ -9,7 +10,7 @@ class BoolRule extends AbstractRule {
      * @param mixed $input
      * @return boolean
      */
-    public function validate($input) {
+    public function validate($input): bool {
         return is_bool($input) || $input == 0 || $input == 1;
     }
 }

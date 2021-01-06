@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 namespace Zodream\Validate\Rules;
 
 use Exception;
@@ -89,11 +90,11 @@ class IpRule extends AbstractRule {
         $range['mask'] = sprintf('%032b', ip2long(long2ip(~(2 ** (32 - $input[1]) - 1))));
     }
 
-    public function validate($input) {
+    public function validate($input): bool {
         return $this->verifyAddress($input) && $this->verifyNetwork($input);
     }
 
-    protected function verifyAddress($address) {
+    protected function verifyAddress($address): bool {
         return (bool) filter_var(
             $address,
             FILTER_VALIDATE_IP,
@@ -103,7 +104,7 @@ class IpRule extends AbstractRule {
         );
     }
 
-    protected function verifyNetwork($input) {
+    protected function verifyNetwork($input): bool {
         if (null === $this->networkRange) {
             return true;
         }
@@ -118,7 +119,7 @@ class IpRule extends AbstractRule {
             && bccomp($input, sprintf('%u', ip2long($this->networkRange['max']))) <= 0;
     }
 
-    protected function belongsToSubnet($input) {
+    protected function belongsToSubnet($input): bool {
         $range = $this->networkRange;
         $min = sprintf('%032b', ip2long($range['min']));
         $input = sprintf('%032b', ip2long($input));

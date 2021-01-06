@@ -1,6 +1,6 @@
 <?php
+declare(strict_types=1);
 namespace Zodream\Validate;
-
 
 interface RuleInterface {
 
@@ -10,5 +10,5 @@ interface RuleInterface {
 
     public function reportError($input, array $relatedExceptions = []);
 
-    public function validate($input);
+    public function validate($input): bool;
 }

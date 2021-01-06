@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 namespace Zodream\Validate\Rules;
 
 class InRule extends AbstractRule {
@@ -16,7 +17,7 @@ class InRule extends AbstractRule {
         $this->compareIdentical = $compareIdentical;
     }
 
-    protected function validateEquals($input) {
+    protected function validateEquals($input): bool {
         if (is_array($this->haystack)) {
             return in_array($input, $this->haystack);
         }
@@ -30,7 +31,7 @@ class InRule extends AbstractRule {
         return false !== mb_stripos($this->haystack, $inputString, 0, mb_detect_encoding($inputString));
     }
 
-    protected function validateIdentical($input) {
+    protected function validateIdentical($input): bool {
         if (is_array($this->haystack)) {
             return in_array($input, $this->haystack, true);
         }
@@ -44,7 +45,7 @@ class InRule extends AbstractRule {
         return false !== mb_strpos($this->haystack, $inputString, 0, mb_detect_encoding($inputString));
     }
 
-    public function validate($input) {
+    public function validate($input): bool {
         if ($this->compareIdentical) {
             return $this->validateIdentical($input);
         }

@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 namespace Zodream\Validate;
 
 use Zodream\Helpers\Str;
@@ -32,7 +33,7 @@ class RuleFactory {
     /**
      * @var string[]
      */
-    private $rulesNamespaces = [];
+    private array $rulesNamespaces = [];
 
     public function __construct(array $rulesNamespaces) {
         $this->rulesNamespaces = $this->filterNamespaces($rulesNamespaces, self::DEFAULT_RULES_NAMESPACES);
@@ -44,7 +45,7 @@ class RuleFactory {
      * @return RuleInterface
      * @throws Exception
      */
-    public function rule($ruleName, array $arguments = []) {
+    public function rule(string $ruleName, array $arguments = []): RuleInterface {
         if (empty($ruleName)) {
             return new NullableRule();
         }
@@ -60,7 +61,7 @@ class RuleFactory {
     }
 
 
-    private function createReflectionClass($name, $parentName) {
+    private function createReflectionClass($name, $parentName): ReflectionClass {
         $reflection = new ReflectionClass($name);
         if (!$reflection->isSubclassOf($parentName)) {
             throw new Exception(sprintf(
@@ -69,7 +70,7 @@ class RuleFactory {
         }
 
         if (!$reflection->isInstantiable()) {
-            throw new InvalidClassException(sprintf(
+            throw new Exception(sprintf(
                 __('"%s" must be instantiable'), $name));
         }
 
