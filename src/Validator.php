@@ -59,9 +59,9 @@ class Validator {
     ];
 
     /**
-     * @var MessageBag
+     * @var MessageBag|null
      */
-    protected MessageBag $message;
+    protected ?MessageBag $message = null;
 
     public function __construct() {
         if (!function_exists('trans')) {
@@ -162,7 +162,7 @@ class Validator {
      * @throws Exception
      */
     public function passes(): bool {
-        $this->message = new MessageBag;
+        $this->message = new MessageBag();
         foreach ($this->rules as $item) {
             foreach ((array)$item['keys'] as $key) {
                 $this->validateRule($key, isset($this->attributes[$key]) ? $this->attributes[$key] : null, $item['rules'], $item['message']);
