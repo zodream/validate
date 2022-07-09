@@ -8,6 +8,8 @@ namespace Zodream\Validate;
  * Date: 2016/12/6
  * Time: 12:16
  */
+
+use ArrayAccess;
 use Exception;
 use Zodream\Validate\Rules\UrlRule;
 use Zodream\Validate\Rules\RequiredRule;
@@ -204,7 +206,7 @@ class Validator {
      * @return string
      */
     public function getMessage($key, $rule, $message = null): string {
-        $label = isset($this->labels[$key]) ? $this->labels[$key] : $key;
+        $label = $this->labels[$key] ?? $key;
         if (!is_null($message)) {
             return str_replace(':attribute', $label, $message);
         }
@@ -273,6 +275,31 @@ class Validator {
             return $validator;
         }
         return $validator->validate($data);
+    }
+
+    /**
+     * @param array|ArrayAccess $data
+     * @param array $rules
+     * @return array
+     * @throws ValidationException
+     */
+    public static function filter(mixed $data, array $rules): array {
+        $items = [];
+        $validator = new static();
+        foreach ($rules as $key => $rule) {
+            $rule = $validator->converterRule($rule);
+            $value = $data[$key] ?? null;
+            if (is_null($value) && !isset($item['rules']['required'])) {
+                continue;
+            }
+            if ($validator->validateRule($key, $value, $rule['rules'], $rule['message'])) {
+                $items[$key] = $value;
+            }
+        }
+        if ($validator->messages()->isEmpty()) {
+            return $items;
+        }
+        throw new ValidationException($validator);
     }
 
     /**
