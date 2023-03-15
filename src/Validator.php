@@ -289,7 +289,7 @@ class Validator {
         foreach ($rules as $key => $rule) {
             $rule = $validator->converterRule($rule);
             $value = $data[$key] ?? null;
-            if (is_null($value) && !isset($item['rules']['required'])) {
+            if ((is_null($value) || $value === '') && !isset($item['rules']['required'])) {
                 continue;
             }
             if ($validator->validateRule($key, $value, $rule['rules'], $rule['message'])) {
