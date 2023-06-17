@@ -6,25 +6,18 @@ use Exception;
 
 abstract class AbstractFilterRule extends AbstractRule {
 
-    public $additionalChars = '';
 
-    abstract protected function validateClean($input);
+    abstract protected function validateClean(mixed $input);
 
-    public function __construct($additionalChars = '') {
-        if (!is_string($additionalChars)) {
-            throw new Exception(
-                __('Invalid list of additional characters to be loaded')
-            );
-        }
-
-        $this->additionalChars .= $additionalChars;
+    public function __construct(
+        public string $additionalChars = '') {
     }
 
-    protected function filter($input) {
-        return str_replace(str_split($this->additionalChars), '', $input);
+    protected function filter(mixed $input): mixed {
+        return str_replace(str_split($this->additionalChars), '', (string)$input);
     }
 
-    public function validate($input): bool {
+    public function validate(mixed $input): bool {
         if (!is_scalar($input)) {
             return false;
         }
@@ -33,9 +26,7 @@ abstract class AbstractFilterRule extends AbstractRule {
         if ('' === $stringInput) {
             return false;
         }
-
         $cleanInput = $this->filter($stringInput);
-
         return '' === $cleanInput || $this->validateClean($cleanInput);
     }
 }

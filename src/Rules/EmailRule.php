@@ -10,7 +10,7 @@ class EmailRule extends AbstractRule {
      * @param mixed $input
      * @return boolean
      */
-    public function validate($input): bool {
+    public function validate(mixed $input): bool {
         return is_string($input) && filter_var($input, FILTER_VALIDATE_EMAIL);
     }
 }

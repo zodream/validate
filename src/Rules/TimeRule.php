@@ -10,7 +10,7 @@ class TimeRule extends AbstractRule {
      * @param mixed $input
      * @return boolean
      */
-    public function validate($input): bool {
+    public function validate(mixed $input): bool {
         return strtotime($input) !== false;
     }
 }

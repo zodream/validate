@@ -10,7 +10,7 @@ class JsonRule extends AbstractRule {
      * @param mixed $input
      * @return boolean
      */
-    public function validate($input): bool {
+    public function validate(mixed $input): bool {
         if (!is_string($input) || '' === $input) {
             return false;
         }

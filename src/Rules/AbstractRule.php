@@ -12,14 +12,14 @@ abstract class AbstractRule implements RuleInterface {
      * @param mixed $input
      * @return boolean
      */
-    abstract public function validate($input): bool;
+    abstract public function validate(mixed $input): bool;
 
     /**
      * 验证
      * @param mixed $input
      * @throws Exception
      */
-    public function assert($input) {
+    public function assert(mixed $input): void {
         if ($this->validate($input)) {
             return;
         }
@@ -31,23 +31,24 @@ abstract class AbstractRule implements RuleInterface {
      * @param mixed $input
      * @throws Exception
      */
-    public function check($input){
+    public function check(mixed $input): void {
         $this->assert($input);
     }
 
     /**
      * @param mixed $input
-     * @param array $extraParams
+     * @param array $relatedExceptions
      * @return Exception
+     * @throws Exception
      */
-    public function reportError($input, array $extraParams = []) {
+    public function reportError(mixed $input, array $relatedExceptions = []): Exception {
         return new Exception(sprintf(
             __('%s is error'),
             $input));
     }
 
 
-    public function __invoke($input) {
+    public function __invoke(mixed $input): bool {
         return $this->validate($input);
     }
 }

@@ -2,13 +2,15 @@
 declare(strict_types=1);
 namespace Zodream\Validate;
 
+use Exception;
+
 interface RuleInterface {
 
-    public function assert($input);
+    public function assert(mixed $input): void;
 
-    public function check($input);
+    public function check(mixed $input): void;
 
-    public function reportError($input, array $relatedExceptions = []);
+    public function reportError(mixed $input, array $relatedExceptions = []): Exception;
 
-    public function validate($input): bool;
+    public function validate(mixed $input): bool;
 }

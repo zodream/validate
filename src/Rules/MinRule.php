@@ -5,10 +5,10 @@ namespace Zodream\Validate\Rules;
 
 class MinRule extends AbstractRule {
 
-    public $minValue = 0;
+    protected int|float $minValue = 0;
 
-    public function __construct($min = 0) {
-        $this->minValue = $min;
+    public function __construct(mixed $min = 0) {
+        $this->minValue = !is_float($min) && !is_integer($min) ? floatval($min) : $min;
     }
 
     /**
@@ -16,7 +16,7 @@ class MinRule extends AbstractRule {
      * @param mixed $input
      * @return boolean
      */
-    public function validate($input): bool {
+    public function validate(mixed $input): bool {
         return $input >= $this->minValue;
     }
 }

@@ -6,11 +6,11 @@ use Exception;
 
 class IpRule extends AbstractRule {
 
-    public $ipOptions;
+    public  $ipOptions;
 
     public $networkRange;
 
-    public function __construct($ipOptions = null) {
+    public function __construct(mixed $ipOptions = null) {
         if (is_int($ipOptions)) {
             $this->ipOptions = $ipOptions;
 
@@ -20,7 +20,7 @@ class IpRule extends AbstractRule {
         $this->networkRange = $this->parseRange($ipOptions);
     }
 
-    protected function parseRange($input) {
+    protected function parseRange(mixed $input) {
         if (null === $input || '*' == $input || '*.*.*.*' == $input
             || '0.0.0.0-255.255.255.255' == $input) {
             return;
@@ -55,7 +55,7 @@ class IpRule extends AbstractRule {
         return $range;
     }
 
-    protected function fillAddress(&$input, $char = '*') {
+    protected function fillAddress(&$input, string $char = '*') {
         while (mb_substr_count($input, '.') < 3) {
             $input .= '.'.$char;
         }
@@ -90,11 +90,11 @@ class IpRule extends AbstractRule {
         $range['mask'] = sprintf('%032b', ip2long(long2ip(~(2 ** (32 - $input[1]) - 1))));
     }
 
-    public function validate($input): bool {
+    public function validate(mixed $input): bool {
         return $this->verifyAddress($input) && $this->verifyNetwork($input);
     }
 
-    protected function verifyAddress($address): bool {
+    protected function verifyAddress(mixed $address): bool {
         return (bool) filter_var(
             $address,
             FILTER_VALIDATE_IP,
@@ -104,7 +104,7 @@ class IpRule extends AbstractRule {
         );
     }
 
-    protected function verifyNetwork($input): bool {
+    protected function verifyNetwork(mixed $input): bool {
         if (null === $this->networkRange) {
             return true;
         }
@@ -119,7 +119,7 @@ class IpRule extends AbstractRule {
             && bccomp($input, sprintf('%u', ip2long($this->networkRange['max']))) <= 0;
     }
 
-    protected function belongsToSubnet($input): bool {
+    protected function belongsToSubnet(mixed $input): bool {
         $range = $this->networkRange;
         $min = sprintf('%032b', ip2long($range['min']));
         $input = sprintf('%032b', ip2long($input));

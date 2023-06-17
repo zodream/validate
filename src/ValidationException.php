@@ -3,25 +3,28 @@ declare(strict_types=1);
 namespace Zodream\Validate;
 
 use Exception;
+use Zodream\Infrastructure\Contracts\ArrayAble;
+use Zodream\Infrastructure\Support\MessageBag;
 
-class ValidationException extends Exception {
-    /**
-     * The validator instance.
-     *
-     * @var Validator
-     */
-    public $validator;
+class ValidationException extends Exception implements ArrayAble {
+
+    public MessageBag $bag;
 
     /**
      * Create a new exception instance.
      *
-     * @param  Validator  $validator
+     * @param Validator|MessageBag $validator
      */
-    public function __construct($validator) {
+    public function __construct(
+        Validator|MessageBag $validator) {
+        $this->bag = $validator instanceof Validator ? $validator->messages() : $validator;
         parent::__construct(
-            $validator->firstError()
+            $this->bag->first()
             // __('The given data failed to pass validation.')
         );
-        $this->validator = $validator;
+    }
+
+    public function toArray(): array {
+        return $this->bag->toArray();
     }
 }

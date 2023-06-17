@@ -15,13 +15,13 @@ class LengthRule extends AbstractRule {
         $this->inclusive = $inclusive;
     }
 
-    public function validate($input): bool {
+    public function validate(mixed $input): bool {
         $length = $this->extractLength($input);
 
         return $this->validateMin($length) && $this->validateMax($length);
     }
 
-    protected function extractLength($input): int {
+    protected function extractLength(mixed $input): int {
         if (is_string($input)) {
             $encoding = mb_detect_encoding($input);
             return $encoding ? mb_strlen($input, $encoding) : mb_strlen($input);

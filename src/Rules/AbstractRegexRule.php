@@ -6,7 +6,7 @@ abstract class AbstractRegexRule extends AbstractFilterRule {
 
     abstract protected function getPregFormat(): string;
 
-    public function validateClean($input) {
+    public function validateClean(mixed $input): bool {
         return preg_match($this->getPregFormat(), $input);
     }
 }

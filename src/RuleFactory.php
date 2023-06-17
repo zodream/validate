@@ -5,26 +5,12 @@ namespace Zodream\Validate;
 use Zodream\Helpers\Str;
 use ReflectionClass;
 use Exception;
+use Zodream\Infrastructure\Concerns\SingletonPattern;
 use Zodream\Validate\Rules\NullableRule;
 
 class RuleFactory {
-    /**
-     * @var static
-     */
-    protected static $instance;
 
-    /**
-     * 单例
-     * @param array $args
-     * @return static
-     */
-    public static function getInstance($args = array()) {
-        if (is_null(static::$instance)) {
-            static::$instance = false; // 初始化未完成
-            static::$instance = new static($args);
-        }
-        return static::$instance;
-    }
+    use SingletonPattern;
 
     const DEFAULT_RULES_NAMESPACES = [
         'Zodream\\Validate\\Rules',
@@ -61,7 +47,7 @@ class RuleFactory {
     }
 
 
-    private function createReflectionClass($name, $parentName): ReflectionClass {
+    private function createReflectionClass(string $name, string $parentName): ReflectionClass {
         $reflection = new ReflectionClass($name);
         if (!$reflection->isSubclassOf($parentName)) {
             throw new Exception(sprintf(
@@ -77,7 +63,7 @@ class RuleFactory {
         return $reflection;
     }
 
-    private function filterNamespaces(array $namespaces, array $defaultNamespaces) {
+    private function filterNamespaces(array $namespaces, array $defaultNamespaces): array {
         $filter = function ($namespace){
             return trim($namespace, '\\');
         };

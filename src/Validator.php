@@ -11,6 +11,7 @@ namespace Zodream\Validate;
 
 use ArrayAccess;
 use Exception;
+use Zodream\Infrastructure\Support\MessageBag;
 use Zodream\Validate\Rules\UrlRule;
 use Zodream\Validate\Rules\RequiredRule;
 use Zodream\Validate\Rules\RegexRule;
@@ -45,6 +46,9 @@ use Zodream\Validate\Rules\IntRule;
 class Validator {
 
     protected array $attributes = [];
+    /**
+     * @var array{keys:string[],rules:string[][],message: string}[]
+     */
     protected array $rules = [];
     protected array $labels = [];
     protected array $messages = [
@@ -79,12 +83,12 @@ class Validator {
         }
     }
 
-    public function setAttributes($arg) {
-        $this->attributes = (array)$arg;
+    public function setAttributes(array $arg) {
+        $this->attributes = $arg;
         return $this;
     }
 
-    public function setRules($args) {
+    public function setRules(array|string $args) {
         foreach ((array)$args as $key => $arg) {
             $this->rules[] = $this->converterRules($arg, $key);
         }
@@ -107,11 +111,11 @@ class Validator {
 
     /**
      * 格式化规则
-     * @param $rule
-     * @param null $keys
+     * @param string|array|null $rule
+     * @param int|array|null $keys
      * @return array
      */
-    protected function converterRules($rule, $keys = null) {
+    protected function converterRules(null|string|array $rule, int|array|null $keys = null): array {
         if (is_integer($keys) && is_array($rule)) {
             $keys = array_shift($rule);
         }
@@ -122,10 +126,10 @@ class Validator {
 
     /**
      * 转化一条规则
-     * @param $rule
+     * @param array|string|null $rule
      * @return array
      */
-    public function converterRule($rule) {
+    public function converterRule(array|null|string $rule): array {
         if (!is_array($rule)) {
             $rule = empty($rule) ? [] : explode('|', $rule);
         }
@@ -167,21 +171,21 @@ class Validator {
         $this->message = new MessageBag();
         foreach ($this->rules as $item) {
             foreach ((array)$item['keys'] as $key) {
-                $this->validateRule($key, isset($this->attributes[$key]) ? $this->attributes[$key] : null, $item['rules'], $item['message']);
+                $this->validateRule($key, $this->attributes[$key] ?? null, $item['rules'], $item['message']);
             }
         }
         return $this->message->isEmpty();
     }
 
     /**
-     * @param $key
-     * @param $value
-     * @param $rules
+     * @param string $key
+     * @param mixed $value
+     * @param array $rules
      * @param null $message
      * @return bool
      * @throws Exception
      */
-    public function validateRule($key, $value, array $rules, $message = null): bool {
+    public function validateRule(string $key, mixed $value, array $rules, $message = null): bool {
         if (!$this->message) {
             $this->message = new MessageBag;
         }
@@ -200,12 +204,12 @@ class Validator {
 
     /**
      * 获取验证错误的消息
-     * @param $key
-     * @param $rule
-     * @param null $message
+     * @param string $key
+     * @param string $rule
+     * @param string|null $message
      * @return string
      */
-    public function getMessage($key, $rule, $message = null): string {
+    public function getMessage(string $key, string $rule, ?string $message = null): string {
         $label = $this->labels[$key] ?? $key;
         if (!is_null($message)) {
             return str_replace(':attribute', $label, $message);
@@ -268,7 +272,7 @@ class Validator {
     }
 
 
-    public static function make(array $rules, array $data = null, array $messages = [], array $labels = []) {
+    public static function make(array $rules, array $data = null, array $messages = [], array $labels = []): bool|Validator {
         $validator = new static();
         $validator->setRules($rules)->setLabels($labels)->setMessages($messages);
         if (is_null($data)) {
@@ -303,16 +307,16 @@ class Validator {
     }
 
     /**
-     * @param $ruleName
+     * @param string $ruleName
      * @param array $arguments
      * @return RuleInterface
      * @throws Exception
      */
-    public static function buildRule($ruleName, $arguments = []) {
+    public static function buildRule(string $ruleName, array $arguments = []) {
         return RuleFactory::getInstance()->rule($ruleName, $arguments);
     }
 
-    public static function __callStatic($ruleName, $arguments) {
+    public static function __callStatic(string $ruleName, array $arguments) {
         return static::buildRule($ruleName, $arguments);
     }
 }

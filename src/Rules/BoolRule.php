@@ -10,7 +10,7 @@ class BoolRule extends AbstractRule {
      * @param mixed $input
      * @return boolean
      */
-    public function validate($input): bool {
+    public function validate(mixed $input): bool {
         return is_bool($input) || $input == 0 || $input == 1;
     }
 }

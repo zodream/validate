@@ -10,7 +10,7 @@ class NullableRule extends AbstractRule {
      * @param mixed $input
      * @return boolean
      */
-    public function validate($input): bool {
+    public function validate(mixed $input): bool {
         return true;
     }
 }
