@@ -255,8 +255,7 @@ class Validator {
      * @return MessageBag
      * @throws Exception
      */
-    public function messages(): MessageBag
-    {
+    public function messages(): MessageBag {
         if (! $this->message) {
             $this->passes();
         }
