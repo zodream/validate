@@ -67,7 +67,7 @@ class Validator {
     /**
      * @var MessageBag|null
      */
-    protected ?MessageBag $message = null;
+    protected MessageBag|null $message = null;
 
     public function __construct() {
         if (!function_exists('trans')) {
@@ -209,7 +209,7 @@ class Validator {
      * @param string|null $message
      * @return string
      */
-    public function getMessage(string $key, string $rule, ?string $message = null): string {
+    public function getMessage(string $key, string $rule, string|null $message = null): string {
         $label = $this->labels[$key] ?? $key;
         if (!is_null($message)) {
             return str_replace(':attribute', $label, $message);
