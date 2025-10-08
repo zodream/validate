@@ -271,7 +271,7 @@ class Validator {
     }
 
 
-    public static function make(array $rules, array $data = null, array $messages = [], array $labels = []): bool|Validator {
+    public static function make(array $rules, array|null $data = null, array $messages = [], array $labels = []): bool|Validator {
         $validator = new static();
         $validator->setRules($rules)->setLabels($labels)->setMessages($messages);
         if (is_null($data)) {
