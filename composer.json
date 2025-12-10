@@ -13,9 +13,9 @@
         }
     ],
     "require": {
-        "php": ">=8.2",
-        "zodream/helpers": "^5.3",
-        "zodream/zodream": "^5.3"
+        "php": ">=8.5",
+        "zodream/helpers": "dev-master",
+        "zodream/zodream": "dev-master"
     },
     "autoload": {
         "psr-4": {
