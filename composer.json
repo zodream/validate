@@ -13,7 +13,7 @@
         }
     ],
     "require": {
-        "php": ">=8.5",
+        "php": ">=8.2",
         "zodream/helpers": "dev-master",
         "zodream/zodream": "dev-master"
     },
