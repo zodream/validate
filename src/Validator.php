@@ -116,7 +116,7 @@ class Validator {
      * @return array
      */
     protected function converterRules(null|string|array $rule, int|array|null $keys = null): array {
-        if (is_integer($keys) && is_array($rule)) {
+        if (is_int($keys) && is_array($rule)) {
             $keys = array_shift($rule);
         }
         $rules = $this->converterRule($rule);
@@ -140,7 +140,7 @@ class Validator {
                 $message = $item;
                 continue;
             }
-            if (!is_integer($key)) {
+            if (!is_int($key)) {
                 $rules[$key] = $item;
                 continue;
             }

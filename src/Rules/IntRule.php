@@ -19,7 +19,7 @@ class IntRule extends AbstractRule {
         if (is_bool($input)) {
             $input = $input ? 1 : 0;
         }
-        if (is_integer($input)) {
+        if (is_int($input)) {
             return $this->validateMax($input) && $this->validateMin($input);
         }
         return $input == intval($input) && $this->validateMax($input) && $this->validateMin($input);

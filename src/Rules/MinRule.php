@@ -8,7 +8,7 @@ class MinRule extends AbstractRule {
     protected int|float $minValue = 0;
 
     public function __construct(mixed $min = 0) {
-        $this->minValue = !is_float($min) && !is_integer($min) ? floatval($min) : $min;
+        $this->minValue = !is_float($min) && !is_int($min) ? floatval($min) : $min;
     }
 
     /**
