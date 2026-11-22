@@ -5,14 +5,15 @@ namespace Zodream\Validate\Rules;
 
 class LengthRule extends AbstractRule {
 
-    public $minValue;
-    public $maxValue;
-    public $inclusive;
+    public readonly int|null $minValue;
+    public readonly int|null $maxValue;
 
-    public function __construct($min = null, $max = null, $inclusive = true) {
-        $this->minValue = $min;
-        $this->maxValue = $max;
-        $this->inclusive = $inclusive;
+    public function __construct(
+        int|string|null $min = null, 
+        int|string|null $max = null, 
+        public readonly bool $inclusive = true) {
+        $this->minValue = is_null($min) ? $min : intval($min);
+        $this->maxValue = is_null($max) ? $max : intval($max);
     }
 
     public function validate(mixed $input): bool {

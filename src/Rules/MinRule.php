@@ -5,7 +5,7 @@ namespace Zodream\Validate\Rules;
 
 class MinRule extends AbstractRule {
 
-    protected int|float $minValue = 0;
+    protected readonly int|float $minValue;
 
     public function __construct(mixed $min = 0) {
         $this->minValue = !is_float($min) && !is_int($min) ? floatval($min) : $min;

@@ -5,7 +5,7 @@ namespace Zodream\Validate\Rules;
 
 class MaxRule extends AbstractRule {
 
-    protected float|int $maxValue = 255;
+    protected readonly float|int $maxValue;
 
     public function __construct(mixed $max = 255) {
         $this->maxValue = !is_float($max) && !is_int($max) ? floatval($max) : $max;

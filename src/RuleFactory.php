@@ -19,7 +19,7 @@ class RuleFactory {
     /**
      * @var string[]
      */
-    private array $rulesNamespaces = [];
+    private readonly array $rulesNamespaces;
 
     public function __construct(array $rulesNamespaces) {
         $this->rulesNamespaces = $this->filterNamespaces($rulesNamespaces, self::DEFAULT_RULES_NAMESPACES);

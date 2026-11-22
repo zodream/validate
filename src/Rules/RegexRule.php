@@ -6,7 +6,7 @@ namespace Zodream\Validate\Rules;
 class RegexRule extends AbstractRule {
 
     public function __construct(
-        protected string $regex) {
+        protected readonly string $regex) {
     }
 
     public function validate(mixed $input): bool {

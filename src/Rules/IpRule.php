@@ -6,24 +6,22 @@ use Exception;
 
 class IpRule extends AbstractRule {
 
-    public  $ipOptions;
+    public readonly int $ipOptions;
+    public readonly array|null $networkRange;
 
-    public $networkRange;
-
-    public function __construct(mixed $ipOptions = null) {
+    public function __construct(string|int|null $ipOptions = null) {
         if (is_int($ipOptions)) {
             $this->ipOptions = $ipOptions;
-
             return;
         }
-
+        $this->ipOptions = 0;
         $this->networkRange = $this->parseRange($ipOptions);
     }
 
-    protected function parseRange(mixed $input) {
+    protected function parseRange(string|null $input): array|null {
         if (null === $input || '*' == $input || '*.*.*.*' == $input
             || '0.0.0.0-255.255.255.255' == $input) {
-            return;
+            return null;
         }
 
         $range = ['min' => null, 'max' => null, 'mask' => null];
@@ -55,20 +53,20 @@ class IpRule extends AbstractRule {
         return $range;
     }
 
-    protected function fillAddress(&$input, string $char = '*') {
+    protected function fillAddress(string &$input, string $char = '*') {
         while (mb_substr_count($input, '.') < 3) {
             $input .= '.'.$char;
         }
     }
 
-    protected function parseRangeUsingWildcards($input, &$range) {
+    protected function parseRangeUsingWildcards(string $input, array &$range) {
         $this->fillAddress($input);
 
         $range['min'] = strtr($input, '*', '0');
         $range['max'] = str_replace('*', '255', $input);
     }
 
-    protected function parseRangeUsingCidr($input, &$range) {
+    protected function parseRangeUsingCidr(string $input, array &$range) {
         $input = explode('/', $input);
         $this->fillAddress($input[0], '0');
 
@@ -114,7 +112,6 @@ class IpRule extends AbstractRule {
         }
 
         $input = sprintf('%u', ip2long($input));
-
         return bccomp($input, sprintf('%u', ip2long($this->networkRange['min']))) >= 0
             && bccomp($input, sprintf('%u', ip2long($this->networkRange['max']))) <= 0;
     }

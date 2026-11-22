@@ -6,8 +6,8 @@ namespace Zodream\Validate\Rules;
 class IntRule extends AbstractRule {
 
     public function __construct(
-        protected int|float|null $min = null,
-        protected int|float|null $max = null) {
+        protected readonly int|float|null $min = null,
+        protected readonly int|float|null $max = null) {
     }
 
     /**

@@ -10,7 +10,7 @@ abstract class AbstractFilterRule extends AbstractRule {
     abstract protected function validateClean(mixed $input);
 
     public function __construct(
-        public string $additionalChars = '') {
+        public readonly string $additionalChars = '') {
     }
 
     protected function filter(mixed $input): mixed {
