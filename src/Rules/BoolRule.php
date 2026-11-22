@@ -11,6 +11,6 @@ class BoolRule extends AbstractRule {
      * @return boolean
      */
     public function validate(mixed $input): bool {
-        return is_bool($input) || $input == 0 || $input == 1;
+        return is_bool($input) || $input === 0 || $input === 1 || $input === '0' || $input === '1';
     }
 }
