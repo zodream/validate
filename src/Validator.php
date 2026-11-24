@@ -294,8 +294,18 @@ class Validator {
      * @return RuleInterface
      * @throws Exception
      */
-    public static function buildRule(string $ruleName, array $arguments = []) {
+    public static function buildRule(string $ruleName, array $arguments = []): RuleInterface {
         return RuleFactory::getInstance()->rule($ruleName, $arguments);
+    }
+
+    /**
+     * 格式化规则
+     * @param array|string $rules string 表示一个条记录，array 表示多条记录
+     * @param object|null $instance 提供的内部方法
+     * @return array array{rules: array{string: RuleInterface}[], message: string, keys: string[]|string}[]
+     */
+    public static function convertRule(array|string $rules, object|null $instance = null): array {
+        return RuleFactory::convertFrom($rules, $instance);
     }
 
     public static function __callStatic(string $ruleName, array $arguments) {

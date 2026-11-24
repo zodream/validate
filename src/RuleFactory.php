@@ -92,20 +92,23 @@ class RuleFactory {
      * 转换
      * 
      */
-    public static function convertFrom(array $rules): array {
+    public static function convertFrom(array|string $rules, object|null $instance = null): array {
+        if (is_string($rules)) {
+            return self::convertRule($rules, $instance);
+        }
         $res = [];
         foreach($rules as $keys => $rule) {
             if (is_int($keys) && is_array($rule)) {
                 $keys = array_shift($rule);
             }
-            $next = self::convertRule($rule);
+            $next = self::convertRule($rule, $instance);
             $next['keys'] = $keys;
             $res[] = $next;
         }
         return $res;
     }
 
-    private static function convertRule(null|string|array|RuleInterface $rule): array {
+    private static function convertRule(null|string|array|RuleInterface $rule, object|null $instance = null): array {
         if ($rule instanceof RuleInterface) {
             return [
                 'rules' => [RuleFactory::ruleName($rule) => $rule], 
@@ -133,6 +136,12 @@ class RuleFactory {
             }
             if (is_callable($item)) {
                 $rules[] = $item;
+                continue;
+            }
+            if (is_string($item) && !empty($instance) 
+                && str_contains($item, ':') && method_exists($instance, $item)) {
+                // 增加一个宿主调用方法
+                $rules[] = [$instance, $rule];
                 continue;
             }
             if (!is_string($item) || !str_contains($item, ':')) {
