@@ -37,4 +37,8 @@ class IntRule extends AbstractRule {
     protected function validateMin(mixed $input): bool {
         return is_null($this->minValue) || $this->minValue <= $input;
     }
+
+    public function filter(mixed $input): mixed {
+        return intval($input);
+    }
 }

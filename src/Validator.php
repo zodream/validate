@@ -89,9 +89,7 @@ class Validator {
     }
 
     public function setRules(array|string $args) {
-        foreach ((array)$args as $key => $arg) {
-            $this->rules[] = $this->converterRules($arg, $key);
-        }
+        $this->rules = RuleFactory::convertFrom((array)$args);
         return $this;
     }
 
@@ -110,58 +108,6 @@ class Validator {
     }
 
     /**
-     * 格式化规则
-     * @param string|array|null $rule
-     * @param int|array|null $keys
-     * @return array
-     */
-    protected function converterRules(null|string|array $rule, int|array|null $keys = null): array {
-        if (is_int($keys) && is_array($rule)) {
-            $keys = array_shift($rule);
-        }
-        $rules = $this->converterRule($rule);
-        $rules['keys'] = $keys;
-        return $rules;
-    }
-
-    /**
-     * 转化一条规则
-     * @param array|string|null $rule
-     * @return array
-     */
-    public function converterRule(array|null|string $rule): array {
-        if (!is_array($rule)) {
-            $rule = empty($rule) ? [] : explode('|', $rule);
-        }
-        $rules = [];
-        $message = null;
-        foreach ($rule as $key => $item) {
-            if ($key === 'message') {
-                $message = $item;
-                continue;
-            }
-            if (!is_int($key)) {
-                $rules[$key] = $item;
-                continue;
-            }
-            if (is_callable($item)) {
-                $rules[] = $item;
-            }
-            if (!is_string($item) || !str_contains($item, ':')) {
-                $rules[$item] = [];
-                continue;
-            }
-            list($key, $val) = explode(':', $item, 2);
-            if ($key === 'message') {
-                $message = $val;
-                continue;
-            }
-            $rules[$key] = explode(',', $val);
-        }
-        return compact('rules', 'message');
-    }
-
-    /**
      * Determine if the data passes the validation rules.
      *
      * @return bool
@@ -169,12 +115,49 @@ class Validator {
      */
     public function passes(): bool {
         $this->message = new MessageBag();
-        foreach ($this->rules as $item) {
+        $this->internalValidate($this->rules, $this->attributes);
+        return $this->message->isEmpty();
+    }
+
+    public function internalValidate(array $rules, array $data, string $keyPrefix = ''): bool {
+        $res = true;
+        foreach ($rules as $item) {
             foreach ((array)$item['keys'] as $key) {
-                $this->validateRule($key, $this->attributes[$key] ?? null, $item['rules'], $item['message']);
+                if (!$this->internalValidateRule($keyPrefix.$key, $data[$key] ?? null, $item['rules'], $item['message'])) {
+                    $res = false;
+                }
             }
         }
-        return $this->message->isEmpty();
+        return $res;
+    }
+
+    public function internalFilter(array $rules, mixed $data): array {
+        $res = [];
+        foreach ($rules as $rule) {
+            $key = $rule['keys'];
+            $value = $data[$key] ?? null;
+            if ($this->internalValidateRule($key, $value, $rule['rules'], $rule['message'])) {
+                $res[$key] = is_null($value) ? $value : $this->internalFilterRule($rule['rules'], $value);
+                continue;
+            }
+            return $res;
+        }
+        return $res;
+    }
+
+    public function internalFilterRule(array $rules, mixed $value): mixed {
+        foreach ($rules as $rule) {
+            if ($rule instanceof IChildrenRule) {
+                return $rule->filterNext($value, $this);
+            }
+            if ($rule instanceof RuleInterface) {
+                $next = $rule->filter($value);
+                if ($next !== $value) {
+                    return $next;
+                }
+            }
+        }
+        return $value;
     }
 
     /**
@@ -185,21 +168,30 @@ class Validator {
      * @return bool
      * @throws Exception
      */
-    public function validateRule(string $key, mixed $value, array $rules, $message = null): bool {
+    public function internalValidateRule(string $key, mixed $value, array $rules, string|null $message = null): bool {
         if (!$this->message) {
             $this->message = new MessageBag;
         }
+        $res = true;
         foreach ($rules as $rule => $args) {
-            if (is_callable($args)) {
-                continue;
-            }
-            if (static::buildRule($rule, (array)$args)
-                ->validate($value)) {
+            $cb = $args instanceof RuleInterface || is_callable($args) ? $args : static::buildRule($rule, (array)$args);
+            if ($this->validateValue($cb, $value, $key)) {
                 continue;
             }
             $this->message->add($key, $this->getMessage($key, $rule, $message));
+            $res = false;
         }
-        return $this->message->isEmpty();
+        return $res;
+    }
+
+    private function validateValue(callable|RuleInterface $rule, mixed $value, string $key): bool {
+        if ($rule instanceof IChildrenRule) {
+            return $rule->validateNext($value, $key, $this);
+        }
+        if ($rule instanceof RuleInterface) {
+            return $rule->validate($value);
+        }
+        return (bool)call_user_func($rule, $value);
     }
 
     /**
@@ -287,18 +279,9 @@ class Validator {
      * @throws ValidationException
      */
     public static function filter(mixed $data, array $rules): array {
-        $items = [];
         $validator = new static();
-        foreach ($rules as $key => $rule) {
-            $rule = $validator->converterRule($rule);
-            $value = $data[$key] ?? null;
-            if ((is_null($value) || $value === '') && !isset($item['rules']['required'])) {
-                continue;
-            }
-            if ($validator->validateRule($key, $value, $rule['rules'], $rule['message'])) {
-                $items[$key] = $value;
-            }
-        }
+        $rules = RuleFactory::convertFrom($rules);
+        $items = $validator->internalFilter($rules, $data);
         if ($validator->messages()->isEmpty()) {
             return $items;
         }

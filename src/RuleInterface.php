@@ -13,4 +13,9 @@ interface RuleInterface {
     public function reportError(mixed $input, array $relatedExceptions = []): Exception;
 
     public function validate(mixed $input): bool;
+
+    /**
+     * 验证通过后才转换值
+     */
+    public function filter(mixed $input): mixed;
 }

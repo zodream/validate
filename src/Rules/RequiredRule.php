@@ -11,20 +11,24 @@ class RequiredRule extends AbstractRule {
      * @return boolean
      */
     public function validate(mixed $input): bool {
+        return !self::isEmpty($input);
+    }
+
+    public static function isEmpty(mixed $input): bool {
         if (is_null($input)) {
-            return false;
-        }
-        if (is_string($input)) {
-            return trim($input) !== '';
-        }
-        if (!is_array($input)) {
             return true;
         }
+        if (is_string($input)) {
+            return trim($input) === '';
+        }
+        if (!is_array($input)) {
+            return false;
+        }
         foreach ($input as $item) {
-            if ($this->validate($item)) {
-                return true;
+            if (!self::isEmpty($item)) {
+                return false;
             }
         }
-        return false;
+        return true;
     }
 }

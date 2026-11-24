@@ -11,6 +11,6 @@ class TimeRule extends AbstractRule {
      * @return boolean
      */
     public function validate(mixed $input): bool {
-        return strtotime($input) !== false;
+        return is_string($input) &&strtotime($input) !== false;
     }
 }

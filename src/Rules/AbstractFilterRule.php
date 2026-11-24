@@ -2,8 +2,6 @@
 declare(strict_types=1);
 namespace Zodream\Validate\Rules;
 
-use Exception;
-
 abstract class AbstractFilterRule extends AbstractRule {
 
 
@@ -13,7 +11,7 @@ abstract class AbstractFilterRule extends AbstractRule {
         public readonly string $additionalChars = '') {
     }
 
-    protected function filter(mixed $input): mixed {
+    public function filter(mixed $input): mixed {
         return str_replace(str_split($this->additionalChars), '', (string)$input);
     }
 

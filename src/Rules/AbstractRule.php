@@ -14,6 +14,10 @@ abstract class AbstractRule implements RuleInterface {
      */
     abstract public function validate(mixed $input): bool;
 
+    public function filter(mixed $input): mixed {
+        return $input;
+    }
+
     /**
      * 验证
      * @param mixed $input

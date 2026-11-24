@@ -75,4 +75,79 @@ class RuleFactory {
             )
         );
     }
+
+    /**
+     * 根据类名获取规则名
+     */
+    public static function ruleName(RuleInterface|string $rule) {
+        $cls = $rule instanceof RuleInterface ? get_class($rule) : $rule;
+        $i = stripos($cls, '\\');
+        $name = $i === false ? $cls : substr($cls, $i + 1);
+        if (str_ends_with($name, 'Rule')) {
+            $name = substr($name, 0, strlen($name) - 4);
+        }
+        return Str::unStudly($name);
+    }
+    /**
+     * 转换
+     * 
+     */
+    public static function convertFrom(array $rules): array {
+        $res = [];
+        foreach($rules as $keys => $rule) {
+            if (is_int($keys) && is_array($rule)) {
+                $keys = array_shift($rule);
+            }
+            $next = self::convertRule($rule);
+            $next['keys'] = $keys;
+            $res[] = $next;
+        }
+        return $res;
+    }
+
+    private static function convertRule(null|string|array|RuleInterface $rule): array {
+        if ($rule instanceof RuleInterface) {
+            return [
+                'rules' => [RuleFactory::ruleName($rule) => $rule], 
+                'message' => null
+            ];
+        }
+        if (!is_array($rule)) {
+            $rule = empty($rule) ? [] : explode('|', $rule);
+        }
+        $rules = [];
+        $message = null;
+        $factory = self::getInstance();
+        foreach ($rule as $key => $item) {
+            if ($key === 'message') {
+                $message = $item;
+                continue;
+            }
+            if (!is_int($key)) {
+                $rules[$key] = $factory->rule($key, (array)$item);
+                continue;
+            }
+            if ($item instanceof RuleInterface) {
+                $rules[RuleFactory::ruleName($item)] = $item;
+                continue;
+            }
+            if (is_callable($item)) {
+                $rules[] = $item;
+                continue;
+            }
+            if (!is_string($item) || !str_contains($item, ':')) {
+                $rules[$item] = $factory->rule($item, []);
+                continue;
+            }
+            list($key, $val) = explode(':', $item, 2);
+            if ($key === 'message') {
+                $message = $val;
+                continue;
+            }
+            $rules[$key] = $factory->rule($key, explode(',', $val));
+        }
+        return compact('rules', 'message');
+    } 
+
+
 }

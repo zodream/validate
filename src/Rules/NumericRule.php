@@ -13,4 +13,14 @@ class NumericRule extends AbstractRule {
     public function validate(mixed $input): bool {
         return is_numeric($input);
     }
+
+    public function filter(mixed $input): mixed {
+        if (!is_string($input)) {
+            return $input;
+        }
+        if (str_contains($input, '.')) {
+            return floatval($input);
+        }
+        return intval($input);
+    }
 }
