@@ -11,6 +11,7 @@ namespace Zodream\Validate;
 
 use ArrayAccess;
 use Exception;
+use Zodream\Helpers\Arr;
 use Zodream\Infrastructure\Support\MessageBag;
 use Zodream\Validate\Rules\UrlRule;
 use Zodream\Validate\Rules\RequiredRule;
@@ -136,11 +137,14 @@ class Validator {
         foreach ($rules as $rule) {
             $key = $rule['keys'];
             $value = $data[$key] ?? null;
-            if ($this->internalValidateRule($key, $value, $rule['rules'], $rule['message'])) {
-                $res[$key] = is_null($value) ? $value : $this->internalFilterRule($rule['rules'], $value);
+            if (!$this->internalValidateRule($key, $value, $rule['rules'], $rule['message'])) {
+                return $res;
+            }
+            if (is_null($value) && !Arr::exists($data, $key)) {
+                // 跳过没有的值
                 continue;
             }
-            return $res;
+            $res[$key] = is_null($value) ? $value : $this->internalFilterRule($rule['rules'], $value);
         }
         return $res;
     }
@@ -221,8 +225,7 @@ class Validator {
      * @return bool
      * @throws Exception
      */
-    public function fails(): bool
-    {
+    public function fails(): bool {
         return ! $this->passes();
     }
 
@@ -233,8 +236,7 @@ class Validator {
      * @return boolean
      * @throws Exception
      */
-    public function validate(array $data = []): bool
-    {
+    public function validate(array $data = []): bool {
         if (!empty($data)) {
             $this->setAttributes($data);
         }
